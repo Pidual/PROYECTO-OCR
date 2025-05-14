@@ -1,0 +1,61 @@
+version: '3'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"  # AMQP protocol
+      - "15672:15672"  # Management UI
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=user
+      - RABBITMQ_DEFAULT_PASS=password
+
+  ollama:
+    image: ollama/ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.api
+    ports:
+      - "5000:5000"
+    volumes:
+      - ../:/app
+      - uploads_data:/app/data/uploads
+      - resultados_data:/app/data/resultados
+    depends_on:
+      - rabbitmq
+      - ollama
+
+  worker:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.worker
+    volumes:
+      - ../:/app
+      - uploads_data:/app/data/uploads
+      - resultados_data:/app/data/resultados
+    depends_on:
+      - rabbitmq
+      - ollama
+    deploy:
+      replicas: 2  # Run multiple worker instances if needed
+
+volumes:
+  rabbitmq_data:
+  ollama_data:
+  uploads_data:
+  resultados_data:
