@@ -128,26 +128,7 @@ Resultado esperado:
 
 * Si tu GPU no tiene suficiente VRAM, cambia a un modelo más liviano (aunque los resultados serán meh 😞).
 * No olvides actualizar el modelo en el `.env`.
+* este comando es util para revisar nvidia-smi ollama ps y los procesos de python todo al mismo tiempo en la misma terminal (me sirvio arto para revisar que el modelo usara la GPU corectamente ademas informacion interesante como cuanta luz se esta jalando el modelo xD) `watch -n 1 "nvidia-smi && echo '' && ollama ps && echo '' && ps aux | grep python | grep -v grep"`
 
-**Resultados incorrectos:**
-
-* Prueba con otros modelos disponibles.
-* Ajusta el flujo en `ocr_processor.py`.
 
 ---
-
-## 📊 Ejemplos
-
-Integración con una aplicación web:
-
-> *(Aquí podrías agregar más ejemplos o capturas si deseas.)*
-
----
-
-## 📝 Licencia
-
-Este proyecto está bajo la licencia MIT.
-
----
-
-Si quieres, también puedo ayudarte a hacer una tabla de modelos probados con sus pros y contras. ¿Te gustaría incluir eso en el README?
