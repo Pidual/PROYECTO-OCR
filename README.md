@@ -110,8 +110,7 @@ chmod +x run.py
 
 > También puedes especificar el modelo directamente.
 > SI todo esta funcionando deberias ver esto en el terminal
-**![image](https://github.com/user-attachments/assets/2e60a33e-f158-482d-aad4-6533ddd887f8)
-**
+**![image](https://github.com/user-attachments/assets/2e60a33e-f158-482d-aad4-6533ddd887f8)**
 ---
 
 ## 🖼️ Enviar imágenes para procesamiento
@@ -137,4 +136,5 @@ Resultado esperado:
 ---
 
 WHAWHWAHWAH HAWHWAH AWHWAHAW HWAHWAH HAWH WHA HAH AWWHWHA HWA A Todo este codigo fue generado en un 98% por claude SOnnet3.7 :) 
+
 ![6d8](https://github.com/user-attachments/assets/f3baff38-f024-46b7-a9f3-2763bd825f1f)
