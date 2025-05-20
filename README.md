@@ -133,4 +133,5 @@ Resultado esperado:
 
 ---
 
-![fetchimage](https://github.com/user-attachments/assets/e8c443ca-b27b-42ff-93d6-9fa864fe2a74)
+WHAWHWAHWAH HAWHWAH AWHWAHAW HWAHWAH HAWH WHA HAH AWWHWHA HWA A Todo este codigo fue generado en un 98% por claude SOnnet3.7 :) 
+![6d8](https://github.com/user-attachments/assets/f3baff38-f024-46b7-a9f3-2763bd825f1f)
