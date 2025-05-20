@@ -24,7 +24,7 @@ Está compuesto por:
 * Una cola de mensajes (RabbitMQ)
 * Un worker que utiliza el modelo `qwen2.5vl:7b` para procesar las imágenes
 
-> 🎯 *De los 9 modelos probados, este fue el único que dijo “sí” a CPU + GPU. Toda una joya.*
+> 🎯 *De los 9 modelos probados, `qwen2.5vl:7b` fue el único que dijo “sí” a CPU + GPU. Toda una joya.*
 
 ---
 
