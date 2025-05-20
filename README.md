@@ -101,9 +101,10 @@ OLLAMA_API_URL=http://localhost:11434/api
 
 ## 🚀 Uso
 
-Iniciar el sistema (usando modelo por defecto):
+Iniciar el sistema (usando modelo por defecto) (chmod para que sea executable):
 
 ```bash
+chmod +x run.py
 ./run.py --all --monitor
 ```
 
