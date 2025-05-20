@@ -5,7 +5,6 @@
 
 Este proyecto implementa un sistema de Reconocimiento Óptico de Caracteres (OCR) para extraer información estructurada de carnés estudiantiles, utilizando modelos de visión integrados con [Ollama](https://ollama.com/).
 
-> ⚠️ *Honestamente, el código es una colección de scripts pegados con cinta... pero funciona. Milagrosamente.*
 
 ---
 
@@ -24,18 +23,18 @@ Está compuesto por:
 * Una cola de mensajes (RabbitMQ)
 * Un worker que utiliza el modelo `qwen2.5vl:7b` para procesar las imágenes
 
-> 🎯 *De los 9 modelos probados, `qwen2.5vl:7b` fue el único que dijo “sí” a CPU + GPU. Toda una joya.*
+> 🎯 *De los 9 modelos probados, `qwen2.5vl:7b` fue el único que presento mejero desepeño con CPU + GPU.*
 
 ---
 
 ## 🖥️ Requisitos del Sistema
 
 * Python `3.8+`
-* NVIDIA GPU con al menos `6GB VRAM` (⚠️ Si tienes menos, el script explotará)
-* Docker (opcional, recomendado para RabbitMQ)
+* NVIDIA GPU con al menos `6GB VRAM` (⚠️ Si tienes menos, el script Fallara)
+* Docker (recomendado para RabbitMQ)
 * Ollama `0.7.0+`
 
-> 💡 Si necesitas usar un modelo más liviano, puedes hacer downgrade a `llava:7b`, pero los resultados son bastante pobres.
+> 💡 Si necesitas usar un modelo más liviano, puedes hacer downgrade a `llava:7b`, pero los resultados son mas inferiores .
 
 ---
 
@@ -132,9 +131,3 @@ Resultado esperado:
 * No olvides actualizar el modelo en el `.env`.
 * este comando es util para revisar nvidia-smi ollama ps y los procesos de python todo al mismo tiempo en la misma terminal (me sirvio arto para revisar que el modelo usara la GPU corectamente ademas informacion interesante como cuanta luz se esta jalando el modelo xD) `watch -n 1 "nvidia-smi && echo '' && ollama ps && echo '' && ps aux | grep python | grep -v grep"`
 
-
----
-
-WHAWHWAHWAH HAWHWAH AWHWAHAW HWAHWAH HAWH WHA HAH AWWHWHA HWA A Todo este codigo fue generado en un 98% por claude SOnnet3.7 :) 
-
-![6d8](https://github.com/user-attachments/assets/f3baff38-f024-46b7-a9f3-2763bd825f1f)
