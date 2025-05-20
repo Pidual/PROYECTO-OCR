@@ -117,6 +117,9 @@ Ejemplo de uso visual:
 
 ![image](https://github.com/user-attachments/assets/ce528db0-6365-41f3-87e5-3deb6432f974)
 
+Resultado esperado:
+![image](https://github.com/user-attachments/assets/031e2d7f-a391-4087-9ebd-ed91dcc277a9)
+
 ---
 
 ## 🔍 Solución de problemas
