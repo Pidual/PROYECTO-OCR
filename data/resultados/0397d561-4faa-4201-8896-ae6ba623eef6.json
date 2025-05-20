@@ -1,0 +1,15 @@
+{
+  "raw_text": "Nombre: CARLOS HERNANDO LOZANO PEREZ\nCódigo: COD 202011823\nCarrera: INGENIERIA DE SISTEMAS Y COMPUTACION\nInstitución: UNIVERSIDAD PEDAGOGICA Y TECNOLOGICA DE COLOMBIA",
+  "nombre": "CARLOS HERNANDO LOZANO PEREZ",
+  "codigo_estudiante": "COD 202011823",
+  "carrera": "INGENIERIA DE SISTEMAS Y COMPUTACION",
+  "institucion": "UNIVERSIDAD PEDAGOGICA Y TECNOLOGICA DE COLOMBIA",
+  "confidence": {
+    "nombre": 1.0,
+    "codigo_estudiante": 1.0,
+    "carrera": 1.0
+  },
+  "job_id": "0397d561-4faa-4201-8896-ae6ba623eef6",
+  "status": "completado",
+  "processed_at": "2025-05-19 23:43:13"
+}
