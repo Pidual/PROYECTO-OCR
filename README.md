@@ -109,7 +109,9 @@ chmod +x run.py
 ```
 
 > También puedes especificar el modelo directamente.
-
+> SI todo esta funcionando deberias ver esto en el terminal
+**![image](https://github.com/user-attachments/assets/2e60a33e-f158-482d-aad4-6533ddd887f8)
+**
 ---
 
 ## 🖼️ Enviar imágenes para procesamiento
