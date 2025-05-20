@@ -20,6 +20,7 @@ RABBITMQ_QUEUE = os.getenv('RABBITMQ_QUEUE', 'ocr_queue')
 
 # Ollama configuration
 OLLAMA_API_URL = os.getenv('OLLAMA_API_URL', 'http://localhost:11434/api')
+OLLAMA_MODEL = os.getenv('OLLAMA_MODEL', 'qwen2.5vl:7b')  # Default model
 
 # API configuration
 API_HOST = os.getenv('HOST', '0.0.0.0')
