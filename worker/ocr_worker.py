@@ -6,6 +6,7 @@ import sys
 from dotenv import load_dotenv
 from ocr_processor import process_image_ocr, extract_fields
 from gpu_utils import check_gpu_usage
+from database import save_result_to_db
 
 # Load environment variables
 load_dotenv()
@@ -63,7 +64,8 @@ def callback(ch, method, properties, body):
             result_file = os.path.join(RESULT_FOLDER, f"{job_id}.json")
             with open(result_file, 'w', encoding='utf-8') as f:
                 json.dump(result_data, f, indent=2, ensure_ascii=False)
-                
+               # Save result to database
+                save_result_to_db(result_data) 
             print(f"Student ID card job {job_id} completed successfully")
         else:
             save_error_result(job_id, "Student ID card OCR processing failed")
