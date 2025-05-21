@@ -71,12 +71,15 @@ document.addEventListener('DOMContentLoaded', function() {
                         <p><small>Si tienes GPU, el procesamiento será más rápido.</small></p>
                     `;
                     setTimeout(checkStatus, 2000);
-                } else if (result.status === "error" || result.error) {
+                } else if (result.status === "completado") {
+                    loadingDiv.style.display = "none";
+                    displayResults(result);
+                } else if (result.status === "error") {
                     loadingDiv.style.display = "none";
                     resultDiv.innerHTML = `<p class="error">Error: ${result.error || "Ocurrió un error en el procesamiento."}</p>`;
                 } else {
                     loadingDiv.style.display = "none";
-                    displayResults(result);
+                    resultDiv.innerHTML = `<p class="error">Respuesta inesperada del servidor.</p>`;
                 }
             } catch (error) {
                 loadingDiv.style.display = "none";
