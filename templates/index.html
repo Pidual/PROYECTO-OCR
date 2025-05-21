@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema OCR - Análisis de Carnets Estudiantiles</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Sistema de Reconocimiento OCR</h1>
+            <p class="subtitle">Análisis de Carnets Estudiantiles con IA</p>
+        </header>
+
+        <main>
+            <section class="upload-section">
+                <div class="upload-container">
+                    <form id="uploadForm" enctype="multipart/form-data">
+                        <div class="upload-area" id="dropZone">
+                            <img src="{{ url_for('static', filename='images/upload-icon.png') }}" alt="Subir imagen" class="upload-icon">
+                            <p>Arrastra y suelta tu imagen aquí o</p>
+                            <input type="file" id="imageInput" name="image" accept="image/*" required>
+                            <label for="imageInput" class="custom-file-input">Seleccionar archivo</label>
+                        </div>
+
+                        <div class="preview-container">
+                            <img id="imagePreview" style="display: none;" alt="Vista previa">
+                        </div>
+
+                        <button type="submit" class="submit-btn">
+                            <span class="btn-text">Procesar Imagen</span>
+                            <span class="btn-icon">→</span>
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <section class="results-section">
+                <div id="loading" class="loading" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Procesando imagen, por favor espere...</p>
+                </div>
+
+                <div id="result" class="result-container">
+                    <!-- Los resultados se mostrarán aquí -->
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>Sistema desarrollado para el procesamiento de carnets estudiantiles</p>
+        </footer>
+    </div>
+
+    <!-- Template para mostrar resultados -->
+    <template id="resultTemplate">
+        <div class="result-card">
+            <h3>Datos Extraídos</h3>
+            <div class="data-grid">
+                <div class="data-item">
+                    <label>Nombre:</label>
+                    <span class="nombre-value"></span>
+                </div>
+                <div class="data-item">
+                    <label>Código:</label>
+                    <span class="codigo-value"></span>
+                </div>
+                <div class="data-item">
+                    <label>Carrera:</label>
+                    <span class="carrera-value"></span>
+                </div>
+                <div class="data-item">
+                    <label>Institución:</label>
+                    <span class="institucion-value"></span>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
