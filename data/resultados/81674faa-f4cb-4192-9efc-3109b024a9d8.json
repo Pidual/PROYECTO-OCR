@@ -1,0 +1,15 @@
+{
+  "raw_text": "Nombre: SANTIAGO VARGAS MARTINEZ\nCódigo: 201611656\nCarrera: INGENIERIA DE SISTEMAS Y COMPUTACION\nInstitución: Universidad Pedagógica y Tecnológica de Colombia",
+  "nombre": "SANTIAGO VARGAS MARTINEZ",
+  "codigo_estudiante": "201611656",
+  "carrera": "INGENIERIA DE SISTEMAS Y COMPUTACION",
+  "institucion": "Universidad Pedagógica y Tecnológica de Colombia",
+  "confidence": {
+    "nombre": 1.0,
+    "codigo_estudiante": 1.0,
+    "carrera": 1.0
+  },
+  "job_id": "81674faa-f4cb-4192-9efc-3109b024a9d8",
+  "status": "completado",
+  "processed_at": "2025-05-20 19:30:52"
+}

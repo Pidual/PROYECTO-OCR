@@ -1,0 +1,15 @@
+{
+  "raw_text": "Nombre: SILVIA JULIANA RODRIGUEZ RODRIGUEZ\nCódigo: 202023822\nCarrera: INGENIERIA DE SISTEMAS Y COMPUTACION\nInstitución: UNIVERSIDAD PEDAGOGICA Y TECNOLOGICA DE COLOMBIA",
+  "nombre": "SILVIA JULIANA RODRIGUEZ RODRIGUEZ",
+  "codigo_estudiante": "202023822",
+  "carrera": "INGENIERIA DE SISTEMAS Y COMPUTACION",
+  "institucion": "UNIVERSIDAD PEDAGOGICA Y TECNOLOGICA DE COLOMBIA",
+  "confidence": {
+    "nombre": 1.0,
+    "codigo_estudiante": 1.0,
+    "carrera": 1.0
+  },
+  "job_id": "9c731fc0-d54e-4f69-bbd4-0e9fa0841839",
+  "status": "completado",
+  "processed_at": "2025-05-20 19:41:10"
+}

@@ -1,0 +1,15 @@
+{
+  "raw_text": "Nombre: ANDERSON EDUARDO CARVAJAL OLIVEROS\nCódigo: 202021638\nCarrera: INGENIERIA DE SISTEMAS Y COMPUTACION\nInstitución: UNIVERSIDAD PEDAGOGICA Y TECNOLOGICA DE COLOMBIA",
+  "nombre": "ANDERSON EDUARDO CARVAJAL OLIVEROS",
+  "codigo_estudiante": "202021638",
+  "carrera": "INGENIERIA DE SISTEMAS Y COMPUTACION",
+  "institucion": "UNIVERSIDAD PEDAGOGICA Y TECNOLOGICA DE COLOMBIA",
+  "confidence": {
+    "nombre": 1.0,
+    "codigo_estudiante": 1.0,
+    "carrera": 1.0
+  },
+  "job_id": "9bf40493-c842-4c64-94ac-a1a2245b3c94",
+  "status": "completado",
+  "processed_at": "2025-05-20 19:46:22"
+}

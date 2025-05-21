@@ -66,7 +66,7 @@ Institución: [transcribed university name]"""
                     "stream": False,
                     **model_params,  # Add all parameters from config
                 },
-                timeout=90,  # Longer timeout
+                timeout=180,  # Increased timeout from 90 to 180 seconds
             )
             
             if response.status_code == 200:
