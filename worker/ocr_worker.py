@@ -3,8 +3,10 @@ import json
 import pika
 import time
 import sys
+import requests
+import base64
 from dotenv import load_dotenv
-from ocr_processor import process_image_ocr, extract_fields
+from ocr_processor import process_image_ocr, extract_fields, OLLAMA_MODEL
 from gpu_utils import check_gpu_usage
 from database import init_db, save_result_to_db
 
@@ -12,7 +14,7 @@ from database import init_db, save_result_to_db
 load_dotenv()
 
 # Initialize the database
-init_db()  # <-- NEW line
+init_db()
 
 # Create results directory
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -23,6 +25,37 @@ os.makedirs(RESULT_FOLDER, exist_ok=True)
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 from shared.config import RABBITMQ_HOST, RABBITMQ_PORT, RABBITMQ_QUEUE
+
+def warmup_model():
+    """Pre-warm the model with a simple request"""
+    print("🔥 Pre-warming the vision model...")
+    try:
+        # Create a simple 1x1 pixel image for warming up
+        sample_image = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVQI12P4//8/AAX+Av7czFnnAAAAAElFTkSuQmCC"
+        
+        # Simple warm-up request
+        response = requests.post(
+            "http://localhost:11434/api/chat",
+            json={
+                "model": OLLAMA_MODEL,
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "Describe this image briefly",
+                        "images": [sample_image],
+                    },
+                ],
+                "stream": False,
+            },
+            timeout=120,  # Longer timeout for warmup
+        )
+        
+        if response.status_code == 200:
+            print("✅ Model pre-warmed successfully")
+        else:
+            print(f"⚠️ Model pre-warming failed: {response.status_code}")
+    except Exception as e:
+        print(f"⚠️ Model pre-warming failed: {e}")
 
 def callback(ch, method, properties, body):
     """
@@ -106,6 +139,9 @@ def start_worker():
     else:
         print("Warning: GPU not available, using CPU only")
         print(f"Reason: {gpu_status.get('error', 'Unknown')}")
+    
+    # Pre-warm the model before starting
+    warmup_model()
     
     while True:
         try:

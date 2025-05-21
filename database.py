@@ -14,7 +14,7 @@ def init_db():
             institucion TEXT,
             status TEXT,
             processed_at TEXT,
-            raw_text TEXT,
+            raw_text TEXT
         )
     ''')
     conn.commit()
@@ -26,7 +26,7 @@ def save_result_to_db(data):
     c.execute('''
         INSERT OR REPLACE INTO resultados (
             job_id, nombre, codigo_estudiante, carrera, institucion,
-            status, processed_at, raw_text,
+            status, processed_at, raw_text
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     ''', (
         data.get('job_id'),
@@ -36,7 +36,7 @@ def save_result_to_db(data):
         data.get('institucion'),
         data.get('status'),
         data.get('processed_at'),
-        data.get('raw_text'),
+        data.get('raw_text')
     ))
     conn.commit()
     conn.close()

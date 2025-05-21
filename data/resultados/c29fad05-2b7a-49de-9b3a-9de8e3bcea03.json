@@ -1,0 +1,15 @@
+{
+  "raw_text": "Nombre: EDWIN CAMILO BECERRA MECHE\nCódigo: 202023070\nCarrera: INGENIERIA DE SISTEMAS Y COMPUTACION\nInstitución: Universidad Pedagógica y Tecnológica de Colombia",
+  "nombre": "EDWIN CAMILO BECERRA MECHE",
+  "codigo_estudiante": "202023070",
+  "carrera": "INGENIERIA DE SISTEMAS Y COMPUTACION",
+  "institucion": "Universidad Pedagógica y Tecnológica de Colombia",
+  "confidence": {
+    "nombre": 1.0,
+    "codigo_estudiante": 1.0,
+    "carrera": 1.0
+  },
+  "job_id": "c29fad05-2b7a-49de-9b3a-9de8e3bcea03",
+  "status": "completado",
+  "processed_at": "2025-05-20 19:23:36"
+}
