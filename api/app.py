@@ -1,25 +1,39 @@
-import sys  # Se asegura de importar sys al inicio
+import sys
 import os
-import json
-import uuid
-import base64
-import pika
-from flask import Flask, request, jsonify
-from dotenv import load_dotenv
+import socket
 
-# Añadir directorio raíz al path de Python
+# Add the project root to Python path
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
-# Cargar variables de entorno
+from shared.config import RABBITMQ_HOST, RABBITMQ_PORT, RABBITMQ_QUEUE
+
+import uuid
+import json
+import base64
+import pika
+from flask import Flask, request, jsonify, render_template
+from dotenv import load_dotenv
+
+# Load environment variables
 load_dotenv()
 
+
+# Función para encontrar un puerto disponible
+def find_free_port():
+    """Encuentra un puerto libre disponible"""
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.bind(('0.0.0.0', 0))
+    port = sock.getsockname()[1]
+    sock.close()
+    return port
+
+
+# Crear la aplicación Flask
 app = Flask(__name__,
-    template_folder='../templates',  # Ruta relativa a las plantillas
-    static_folder='../static'        # Ruta relativa a los archivos estáticos
-)
+            template_folder=os.path.join(os.path.dirname(os.path.dirname(__file__)), 'templates'),
+            static_folder=os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static'))
 
-
-# Crear directorios necesarios
+# Create required directories
 UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'uploads')
 RESULT_FOLDER = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'resultados')
 
@@ -27,71 +41,93 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(RESULT_FOLDER, exist_ok=True)
 
 
-# Conexión a RabbitMQ
+# RabbitMQ connection
 def get_rabbitmq_connection():
     return pika.BlockingConnection(pika.ConnectionParameters(
-        host=os.getenv('RABBITMQ_HOST', 'localhost'),
-        port=int(os.getenv('RABBITMQ_PORT', 5672))
+        host=RABBITMQ_HOST,
+        port=RABBITMQ_PORT
     ))
 
 
-# Endpoint: Procesar imagen
+@app.route('/')
+def index():
+    """Renderiza la página principal"""
+    return render_template('index.html')
+
+
 @app.route('/procesar-imagen', methods=['POST'])
 def process_image():
+    """
+    Endpoint that receives an image, saves it, and queues it for OCR processing
+    """
+    # Generate a unique job ID
     job_id = str(uuid.uuid4())
 
+    # Handle image (either as file or base64)
     if 'image' in request.files:
-        # Si la imagen llega como un archivo
+        # Handle multipart/form-data
         file = request.files['image']
         if file.filename == '':
-            return jsonify({"error": "No se seleccionó un archivo"}), 400
+            return jsonify({"error": "No selected file"}), 400
 
         filename = os.path.join(UPLOAD_FOLDER, f"carnet_{job_id}{os.path.splitext(file.filename)[1]}")
         file.save(filename)
     elif request.is_json and 'image_base64' in request.json:
-        # Si la imagen llega en formato base64
+        # Handle base64 encoded image
         try:
             image_data = base64.b64decode(request.json['image_base64'])
             filename = os.path.join(UPLOAD_FOLDER, f"carnet_{job_id}.png")
             with open(filename, 'wb') as f:
                 f.write(image_data)
         except Exception as e:
-            return jsonify({"error": f"Imagen base64 inválida: {str(e)}"}), 400
+            return jsonify({"error": f"Invalid base64 image: {str(e)}"}), 400
     else:
-        return jsonify({"error": "No se proporcionó ninguna imagen"}), 400
+        return jsonify({"error": "No image provided"}), 400
 
-    # Publica el trabajo en RabbitMQ
+    # Publish message to RabbitMQ
     try:
         connection = get_rabbitmq_connection()
         channel = connection.channel()
         channel.queue_declare(queue='ocr_queue', durable=True)
 
+        # Create message payload
         message = {
             "job_id": job_id,
             "filename": filename
         }
+
+        # Publish message
         channel.basic_publish(
             exchange='',
             routing_key='ocr_queue',
             body=json.dumps(message),
             properties=pika.BasicProperties(
-                delivery_mode=2  # Mensaje persistente
+                delivery_mode=2  # Make message persistent
             )
         )
+
         connection.close()
-        return jsonify({"job_id": job_id, "status": "enviado"})
+
+        return jsonify({
+            "job_id": job_id,
+            "status": "enviado"
+        })
     except Exception as e:
-        return jsonify({"error": f"No se pudo enviar el trabajo: {str(e)}"}), 500
+        return jsonify({"error": f"Failed to queue job: {str(e)}"}), 500
 
 
-# Endpoint: Obtener resultado
 @app.route('/resultado/<job_id>', methods=['GET'])
 def get_result(job_id):
+    """
+    Endpoint to check the status of a processing job or retrieve results
+    """
+    # Validate job_id format (basic security check)
     try:
-        uuid.UUID(job_id, version=4)  # Valida el formato del job_id
+        uuid.UUID(job_id, version=4)
     except ValueError:
-        return jsonify({"error": "Formato de ID de trabajo inválido"}), 400
+        return jsonify({"error": "Invalid job ID format"}), 400
 
+    # Check if result file exists
     result_file = os.path.join(RESULT_FOLDER, f"{job_id}.json")
 
     if os.path.exists(result_file):
@@ -99,13 +135,27 @@ def get_result(job_id):
             with open(result_file, 'r') as f:
                 return jsonify(json.load(f))
         except Exception as e:
-            return jsonify({"error": f"No se pudo leer el archivo de resultado: {str(e)}"}), 500
+            return jsonify({"error": f"Failed to read result file: {str(e)}"}), 500
     else:
-        return jsonify({"status": "procesando"})
+        return jsonify({
+            "status": "procesando"
+        })
 
 
 if __name__ == '__main__':
     host = os.getenv('HOST', '0.0.0.0')
-    port = int(os.getenv('PORT', 5000))
+    try:
+        port = int(os.getenv('PORT', 5000))
+        # Intentar verificar si el puerto está disponible
+        temp_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        temp_socket.bind((host, port))
+        temp_socket.close()
+    except (OSError, socket.error):
+        # Puerto no disponible, usar uno libre
+        port = find_free_port()
+        print(f"⚠️ El puerto 5000 está en uso. Usando puerto alternativo: {port}")
+
     debug = os.getenv('DEBUG', 'False').lower() == 'true'
+
+    print(f"🚀 Iniciando servidor en http://localhost:{port}")
     app.run(host=host, port=port, debug=debug)
