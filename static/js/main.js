@@ -18,85 +18,73 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-  uploadForm.addEventListener('submit', async function(e) {
-       e.preventDefault();
+    uploadForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
 
-       const formData = new FormData();
-       const imageFile = imageInput.files[0];
+        const formData = new FormData();
+        const imageFile = imageInput.files[0];
 
-       if (!imageFile) {
-           alert('Por favor selecciona una imagen');
-           return;
-       }
-
-       formData.append('image', imageFile);
-
-       // Mostrar barra de carga
-       loadingDiv.style.display = 'block';
-       resultDiv.innerHTML = '';
-
-       try {
-           const response = await fetch('/procesar-imagen', {
-               method: 'POST',
-               body: formData
-           });
-
-           if (!response.ok) {
-               throw new Error('Error en el procesamiento de la imagen');
-           }
-
-        const data = await response.json();
-        if (data.job_id) {
-            checkProcessingStatus(data.job_id); // Llama a la nueva función para verificar el estado
-        } else {
-            throw new Error("ID de trabajo no recibido del servidor");
+        if (!imageFile) {
+            alert('Por favor selecciona una imagen');
+            return;
         }
-    } catch (error) {
-        loadingDiv.style.display = "none";
-        resultDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+
+        formData.append('image', imageFile);
+
+        // Mostrar barra de carga
+        loadingDiv.style.display = 'block';
+        resultDiv.innerHTML = '';
+
+        try {
+            const response = await fetch('/procesar-imagen', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error('Error en el procesamiento de la imagen');
+            }
+
+            const data = await response.json();
+            if (data.job_id) {
+                checkProcessingStatus(data.job_id);
+            } else {
+                throw new Error("ID de trabajo no recibido del servidor");
+            }
+        } catch (error) {
+            loadingDiv.style.display = "none";
+            resultDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+        }
+    });
+
+    async function checkProcessingStatus(jobId) {
+        async function checkStatus() {
+            try {
+                const response = await fetch(`/resultado/${jobId}`);
+                const result = await response.json();
+
+                if (result.status === "procesando") {
+                    loadingDiv.innerHTML = `
+                        <div class="spinner"></div>
+                        <p>Procesando imagen, por favor espere...</p>
+                        <p><small>ID de proceso: ${jobId}</small></p>
+                        <p><small>Si tienes GPU, el procesamiento será más rápido.</small></p>
+                    `;
+                    setTimeout(checkStatus, 2000);
+                } else if (result.status === "error" || result.error) {
+                    loadingDiv.style.display = "none";
+                    resultDiv.innerHTML = `<p class="error">Error: ${result.error || "Ocurrió un error en el procesamiento."}</p>`;
+                } else {
+                    loadingDiv.style.display = "none";
+                    displayResults(result);
+                }
+            } catch (error) {
+                loadingDiv.style.display = "none";
+                resultDiv.innerHTML = `<p class="error">Error consultando resultados: ${error.message}</p>`;
+            }
+        }
+        checkStatus();
     }
-
-   });
-
-   // Variable para controlar el número máximo de intentos
-   let maxAttempts = 30; // 30 intentos = 60 segundos aproximadamente
-
-   async function checkProcessingStatus(jobId) {
-       let attempts = 0;
-
-       async function checkStatus() {
-           try {
-               const response = await fetch(`/resultado/${jobId}`);
-               const result = await response.json();
-
-               if (result.status === "procesando") {
-                   attempts++;
-                   if (attempts >= maxAttempts) {
-                       // Si excedemos el número máximo de intentos, mostrar mensaje de tiempo excedido
-                       loadingDiv.style.display = "none";
-                       resultDiv.innerHTML = `<p class="error">El procesamiento está tardando demasiado. Por favor, inténtelo de nuevo más tarde.</p>`;
-                       return;
-                   }
-
-                   // Intentar de nuevo después de 2 segundos
-                   setTimeout(checkStatus, 2000);
-               } else if (result.error) {
-                   loadingDiv.style.display = "none";
-                   resultDiv.innerHTML = `<p class="error">Error: ${result.error}</p>`;
-               } else {
-                   loadingDiv.style.display = "none";
-                   displayResults(result); // Muestra los resultados finales
-               }
-           } catch (error) {
-               loadingDiv.style.display = "none";
-               resultDiv.innerHTML = `<p class="error">Error consultando resultados: ${error.message}</p>`;
-           }
-       }
-
-       // Iniciar el proceso de verificación
-       checkStatus();
-   }
-
 
     function displayResults(data) {
         let htmlContent = '<div class="results-container">';
@@ -114,7 +102,6 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>`;
         }
 
-        // Mostrar los datos estructurados
         htmlContent += `<div class="result-section">
             <h3>Datos Extraídos:</h3>
             <div class="data-grid">`;
@@ -148,7 +135,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         htmlContent += `</div></div>`;
-
         htmlContent += '</div>';
         resultDiv.innerHTML = htmlContent;
     }
