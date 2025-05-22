@@ -3,12 +3,18 @@ import json
 import pika
 import time
 import sys
+import requests
+import base64
 from dotenv import load_dotenv
-from ocr_processor import process_image_ocr, extract_fields
+from ocr_processor import process_image_ocr, extract_fields, OLLAMA_MODEL
 from gpu_utils import check_gpu_usage
+from database import init_db, save_result_to_db
 
 # Load environment variables
 load_dotenv()
+
+# Initialize the database
+init_db()
 
 # Create results directory
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -20,7 +26,36 @@ sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 from shared.config import RABBITMQ_HOST, RABBITMQ_PORT, RABBITMQ_QUEUE
 
-# Update the callback function to handle student ID cards specifically
+def warmup_model():
+    """Pre-warm the model with a simple request"""
+    print("🔥 Pre-warming the vision model...")
+    try:
+        # Create a simple 1x1 pixel image for warming up
+        sample_image = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVQI12P4//8/AAX+Av7czFnnAAAAAElFTkSuQmCC"
+        
+        # Simple warm-up request
+        response = requests.post(
+            "http://localhost:11434/api/chat",
+            json={
+                "model": OLLAMA_MODEL,
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": "Describe this image briefly",
+                        "images": [sample_image],
+                    },
+                ],
+                "stream": False,
+            },
+            timeout=120,  # Longer timeout for warmup
+        )
+        
+        if response.status_code == 200:
+            print("✅ Model pre-warmed successfully")
+        else:
+            print(f"⚠️ Model pre-warming failed: {response.status_code}")
+    except Exception as e:
+        print(f"⚠️ Model pre-warming failed: {e}")
 
 def callback(ch, method, properties, body):
     """
@@ -63,7 +98,10 @@ def callback(ch, method, properties, body):
             result_file = os.path.join(RESULT_FOLDER, f"{job_id}.json")
             with open(result_file, 'w', encoding='utf-8') as f:
                 json.dump(result_data, f, indent=2, ensure_ascii=False)
-                
+
+            # Save result to database
+            save_result_to_db(result_data)  # <-- NEW line
+            
             print(f"Student ID card job {job_id} completed successfully")
         else:
             save_error_result(job_id, "Student ID card OCR processing failed")
@@ -75,12 +113,10 @@ def callback(ch, method, properties, body):
     except Exception as e:
         print(f"Error processing student ID card: {e}")
         try:
-            # Try to save error result if possible
             if 'job_id' in locals():
                 save_error_result(job_id, str(e))
         except:
             pass
-        # Negative acknowledgment in case of failure
         ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
 
 def save_error_result(job_id, error_message):
@@ -96,7 +132,6 @@ def save_error_result(job_id, error_message):
 
 def start_worker():
     """Main function to start the worker"""
-    # Check GPU status
     gpu_status = check_gpu_usage()
     if gpu_status["gpu_available"]:
         print(f"GPU available with {gpu_status['gpu_utilization']}% utilization")
@@ -105,17 +140,17 @@ def start_worker():
         print("Warning: GPU not available, using CPU only")
         print(f"Reason: {gpu_status.get('error', 'Unknown')}")
     
+    # Pre-warm the model before starting
+    warmup_model()
+    
     while True:
         try:
-            # Connect to RabbitMQ with configured host and port
             connection = pika.BlockingConnection(pika.ConnectionParameters(
                 host=RABBITMQ_HOST,
                 port=RABBITMQ_PORT
             ))
             channel = connection.channel()
             channel.queue_declare(queue=RABBITMQ_QUEUE, durable=True)
-            
-            # Set prefetch count to 1 to distribute load evenly among workers
             channel.basic_qos(prefetch_count=1)
             channel.basic_consume(queue=RABBITMQ_QUEUE, on_message_callback=callback)
             
@@ -127,7 +162,7 @@ def start_worker():
         except Exception as e:
             print(f"Worker error: {e}")
             print("Reconnecting in 5 seconds...")
-            time.sleep(5)  # Wait before reconnecting
+            time.sleep(5)
 
 if __name__ == "__main__":
     start_worker()
